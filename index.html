@@ -8385,7 +8385,8 @@ const imageStructure = {
             }
         }
     }
-};        
+};
+        
         // ⚠️ 记得把上面的 "你的用户名" 和 "你的仓库名" 替换成实际的值！
 
         let currentPath = [];
@@ -8393,9 +8394,27 @@ const imageStructure = {
 
         function getCurrentFolder() {
             let folder = imageStructure;
-            for (let path of currentPath) {
-                folder = folder[path].folders || folder[path];
+            console.log('开始获取文件夹，当前路径:', currentPath);
+            console.log('初始 imageStructure:', Object.keys(imageStructure));
+            
+            for (let i = 0; i < currentPath.length; i++) {
+                const pathPart = currentPath[i];
+                console.log(`第 ${i+1} 层: ${pathPart}`);
+                
+                if (folder.folders && folder.folders[pathPart]) {
+                    folder = folder.folders[pathPart];
+                    console.log(`找到子文件夹，当前结构:`, Object.keys(folder));
+                } else if (folder[pathPart]) {
+                    folder = folder[pathPart];
+                    console.log(`直接找到路径，当前结构:`, Object.keys(folder));
+                } else {
+                    console.error(`路径不存在: ${pathPart}`);
+                    console.log('当前 folder 内容:', folder);
+                    return imageStructure;
+                }
             }
+            
+            console.log('最终文件夹:', folder);
             return folder;
         }
 
@@ -8417,14 +8436,24 @@ const imageStructure = {
             
             folderList.innerHTML = '';
             
+            // 调试信息
+            console.log('当前路径:', currentPath);
+            console.log('当前文件夹:', currentFolder);
+            
             if (currentFolder.folders) {
+                console.log('找到子文件夹:', Object.keys(currentFolder.folders));
                 for (let folderName in currentFolder.folders) {
                     const div = document.createElement('div');
                     div.className = 'folder-item';
                     div.textContent = folderName;
-                    div.onclick = () => navigateTo([...currentPath, folderName]);
+                    div.onclick = () => {
+                        console.log('点击文件夹:', folderName);
+                        navigateTo([...currentPath, folderName]);
+                    };
                     folderList.appendChild(div);
                 }
+            } else {
+                console.log('没有子文件夹');
             }
         }
 
@@ -8461,11 +8490,13 @@ const imageStructure = {
         }
 
         function navigateTo(path) {
+            console.log('=== 导航到:', path);
             currentPath = path;
             updateBreadcrumb();
             displayFolders();
             displayRandomImage();
             updateURL();
+            console.log('=== 导航完成 ===');
         }
 
         function updateURL() {
@@ -8501,6 +8532,22 @@ const imageStructure = {
 
         // 初始化：从 URL 参数读取路径
         window.addEventListener('load', () => {
+            // 检查配置
+            console.log('=== 配置检查 ===');
+            console.log('顶层文件夹:', Object.keys(imageStructure));
+            
+            // 检查每个顶层文件夹的结构
+            for (let key in imageStructure) {
+                const folder = imageStructure[key];
+                console.log(`${key}:`, {
+                    hasFolders: !!folder.folders,
+                    hasImages: !!folder.images,
+                    foldersCount: folder.folders ? Object.keys(folder.folders).length : 0,
+                    imagesCount: folder.images ? folder.images.length : 0
+                });
+            }
+            console.log('=== 配置检查完成 ===');
+            
             const urlParams = new URLSearchParams(window.location.search);
             const pathString = urlParams.get('path');
             
