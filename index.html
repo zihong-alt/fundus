@@ -8395,26 +8395,44 @@ const imageStructure = {
         function getCurrentFolder() {
             let folder = imageStructure;
             console.log('开始获取文件夹，当前路径:', currentPath);
-            console.log('初始 imageStructure:', Object.keys(imageStructure));
+            console.log('初始 imageStructure 顶层:', Object.keys(imageStructure));
             
             for (let i = 0; i < currentPath.length; i++) {
                 const pathPart = currentPath[i];
-                console.log(`第 ${i+1} 层: ${pathPart}`);
+                console.log(`第 ${i+1} 层路径: "${pathPart}"`);
+                console.log('当前 folder 的键:', Object.keys(folder));
                 
-                if (folder.folders && folder.folders[pathPart]) {
-                    folder = folder.folders[pathPart];
-                    console.log(`找到子文件夹，当前结构:`, Object.keys(folder));
-                } else if (folder[pathPart]) {
+                // 先尝试直接访问（顶层结构）
+                if (folder[pathPart]) {
                     folder = folder[pathPart];
-                    console.log(`直接找到路径，当前结构:`, Object.keys(folder));
-                } else {
-                    console.error(`路径不存在: ${pathPart}`);
-                    console.log('当前 folder 内容:', folder);
+                    console.log(`✓ 直接找到: ${pathPart}`);
+                }
+                // 再尝试访问 folders 属性（嵌套结构）
+                else if (folder.folders && folder.folders[pathPart]) {
+                    folder = folder.folders[pathPart];
+                    console.log(`✓ 在 folders 中找到: ${pathPart}`);
+                }
+                // 都找不到，返回根目录
+                else {
+                    console.error(`✗ 路径不存在: "${pathPart}"`);
+                    console.log('当前 folder 完整内容:', folder);
+                    console.log('返回到根目录');
                     return imageStructure;
                 }
+                
+                console.log('移动后的结构:', {
+                    hasFolders: !!folder.folders,
+                    hasImages: !!folder.images,
+                    keys: Object.keys(folder)
+                });
             }
             
-            console.log('最终文件夹:', folder);
+            console.log('✓ 最终到达的文件夹:', {
+                hasFolders: !!folder.folders,
+                hasImages: !!folder.images,
+                folderKeys: folder.folders ? Object.keys(folder.folders) : [],
+                imageCount: folder.images ? folder.images.length : 0
+            });
             return folder;
         }
 
