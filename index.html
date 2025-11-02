@@ -162,7 +162,9 @@
 
     <script>
         // 配置文件：定义你的文件夹结构和图片
-        // 请根据你的实际 GitHub 仓库结构修改这个配置
+        // ⚠️ 重要：请用 Python 脚本生成的配置替换这里的内容
+        // 脚本会生成 image_config.js 文件，复制里面的 imageStructure 对象到这里
+        
 // 自动生成的配置
 // GitHub 仓库: https://github.com/zihong-alt/fundus
 // 图片已重命名为 01.jpg, 02.jpg 等格式
@@ -8383,7 +8385,10 @@ const imageStructure = {
             }
         }
     }
-};        let currentPath = [];
+};        
+        // ⚠️ 记得把上面的 "你的用户名" 和 "你的仓库名" 替换成实际的值！
+
+        let currentPath = [];
         let currentImages = [];
 
         function getCurrentFolder() {
